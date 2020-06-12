@@ -1,0 +1,7 @@
+{
+    "production": false,
+    "url": "",
+    "protocol": "http",
+    "ip": "localhost",
+    "port": "3000"
+}

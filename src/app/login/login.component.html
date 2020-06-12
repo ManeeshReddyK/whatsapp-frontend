@@ -1,0 +1,33 @@
+<div class="main-box">
+  <div class="container">
+    <div class="login-box">
+      <h1>Login</h1>
+      <form #form="ngForm">
+        <div class="form-group">
+          <div class="text-box">
+            <i class="fas fa-envelope icon fa-1x"></i><label for="email">Email</label>
+            <input type="text" class="form-control" ngModel placeholder="Email" id="email" name="email" required
+              #emailController="ngModel" pattern="^[a-z0-9](\.?[a-z0-9]){5,}@gmail\.com$">
+            <p style="color: red;" *ngIf="emailController.errors?.required && emailController.touched">Email is required
+            </p>
+            <p style="color: red;"
+              *ngIf="!emailController.errors?.required && emailController.errors?.pattern && emailController.touched">
+              Please enter valid
+              Email address</p>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="text-box">
+            <i class="fas fa-key icon fa-1x"></i><label for="password">Password</label>
+            <input type="password" class="form-control" ngModel placeholder="Password" id="password" name="password"
+              required #passwordController="ngModel">
+            <p style="color: red;" *ngIf="passwordController.invalid && passwordController.touched">Password is
+              required</p>
+          </div>
+        </div>
+        <button class="btn btn-success button" (click)="login(form); form.reset();"
+          [disabled]="form.invalid">sign-in</button>
+      </form>
+    </div>
+  </div>
+</div>

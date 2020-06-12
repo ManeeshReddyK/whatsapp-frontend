@@ -1,0 +1,42 @@
+label {
+    color: #ffff;
+    font-size: 18px;
+}
+
+.login-box {
+    width: 320px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+}
+
+.login-box .icon {
+    float: left;
+    color: white;
+    padding: 5px;
+}
+
+.login-box .button {
+    width: 100%;
+    padding: 5px;
+    font-size: 18px;
+    margin-top: 20px;
+}
+
+.login-box h1 {
+    border-bottom: 5px solid white;
+    width: 35%;
+    color: #fff;
+    margin-bottom: 18px;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.main-box{
+    background-color: #3fc1c0;
+    height: 100vh;
+}
+
+form .ng-invalid.ng-touched {
+    border: 2px solid salmon;;
+}
