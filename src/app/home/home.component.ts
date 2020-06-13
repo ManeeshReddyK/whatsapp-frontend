@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { ApiService } from '../services/api.service';
-import { SessionStorageService } from 'angular-web-storage';
+import { ApiService } from '../sharedFolder/services/api.service';
+import { LocalStorageService } from 'angular-web-storage';
 import { Router } from '@angular/router';
-import { NotifyService } from '../services/notify.service';
+import { NotifyService } from '../sharedFolder/services/notify.service';
 
 @Component({
   selector: 'app-home',
@@ -12,10 +12,14 @@ import { NotifyService } from '../services/notify.service';
 export class HomeComponent implements OnInit {
 
   timeout;
+  userInfo;
+  userContacts;
+  selectedUser;
+  userMessages;
 
   constructor(
     private apiService: ApiService,
-    private sessionStorageService: SessionStorageService,
+    private localStorageService: LocalStorageService,
     private router: Router,
     private notifyService: NotifyService
   ) { }
@@ -25,6 +29,8 @@ export class HomeComponent implements OnInit {
       .subscribe(
         () => {
           console.log("socket connection established");
+          this.getUserProfile();
+          this.getUserContacts();
         },
         (error) => {
           console.log("socket connection failed");
@@ -33,7 +39,7 @@ export class HomeComponent implements OnInit {
           this.clearSession();
         }
       )
-    let expireDate = this.sessionStorageService.get('expiredate');
+    let expireDate = this.localStorageService.get('expiredate');
     let remainingTime = new Date(expireDate).getTime() - new Date().getTime();
 
     if (remainingTime > 0) {
@@ -46,8 +52,55 @@ export class HomeComponent implements OnInit {
     }
   }
 
+  getUserProfile() {
+    this.apiService.getUserProfile()
+      .subscribe(
+        (response: any) => {
+          this.userInfo = response.data;
+        }
+      )
+  }
+
+  getUserContacts() {
+    this.apiService.getUserContacts()
+      .subscribe(
+        (response: any) => {
+          this.userContacts = response.data;
+        },
+        () => {
+          this.userContacts = [];
+        }
+      )
+  }
+
+  addContact(form) {
+    this.apiService.addContact(form.value.email)
+      .subscribe(
+        (response: any) => {
+          this.userContacts.push(response.data);
+        }
+      )
+  }
+
+  getUserMessages(contact) {
+    this.selectedUser = undefined;
+    setTimeout(() => {
+      this.selectedUser = contact.userId._id;
+    }, 0)
+    this.userMessages = [];
+    this.apiService.getUserMessages(contact.conversation_Id, contact.userId.email)
+      .subscribe(
+        (response: any) => {
+          this.userMessages = response.data;
+        },
+        () => {
+          this.userMessages = [];
+        }
+      )
+  }
+
   clearSession() {
-    this.sessionStorageService.clear();
+    this.localStorageService.clear();
     this.router.navigate(['login']);
   }
 

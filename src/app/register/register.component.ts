@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { NotifyService } from '../services/notify.service';
-import { AuthService } from '../services/auth.service';
+import { NotifyService } from '../sharedFolder/services/notify.service';
+import { AuthService } from '../sharedFolder/services/auth.service';
 
 @Component({
   selector: 'app-register',

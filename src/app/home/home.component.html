@@ -1,3 +1,66 @@
-<p>
-  home works!
-</p>
+<div class="container ">
+  <div class="clearfix">
+    <div class="float-right">
+      <p class="d-inline">
+        {{userInfo?.email}}
+      </p>
+      <button class="btn btn-warning btn-sm" (click)="logout()">Logout</button>
+    </div>
+  </div>
+  <div class="row body-container">
+    <div class="col-md-4 contact-container">
+      <div class="row">
+        <div class="col-md-4 col-4">
+          <h5 class="text-muted">Contacts</h5>
+        </div>
+        <div class="col-md-8 col-8">
+          <div class="input-group search-group">
+            <input class="form-control" type="text">
+            <button class="btn btn-sm btn-dark" data-toggle="modal" data-target="#addModal">Add</button>
+          </div>
+        </div>
+      </div>
+      <div class="contacts">
+        <div class="contact " [ngClass]="{'active-chat': selectedUser === contact.userId._id}"
+          *ngFor="let contact of userContacts" (click)="getUserMessages(contact)">
+          <p><em>{{contact.userId.email}}</em></p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-8 message-container">
+      <div class="messages">
+        <div *ngFor="let message of userMessages">
+          <p>{{message}}</p>
+        </div>
+      </div>
+      <div class="input-group" *ngIf="selectedUser">
+        <input class="form-control" type="text" appAutoFocus>
+        <button class="btn btn-primary">send</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add Contacts</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="addForm.reset();">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form #addForm="ngForm">
+          <input appAutoFocus class="form-control" placeholder="Enter email Address" ngModel name="email" type="text"
+            required>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="addForm.reset();">Close</button>
+        <button type="button" class="btn btn-primary" (click)="addContact(addForm); addForm.reset();"
+          data-dismiss="modal">Add</button>
+      </div>
+    </div>
+  </div>
+</div>

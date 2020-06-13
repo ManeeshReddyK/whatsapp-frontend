@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { SessionStorageService } from 'angular-web-storage';
-import { AuthService } from '../services/auth.service';
-import { NotifyService } from '../services/notify.service';
+import { LocalStorageService } from 'angular-web-storage';
+import { AuthService } from '../sharedFolder/services/auth.service';
+import { NotifyService } from '../sharedFolder/services/notify.service';
 
 @Component({
   selector: 'app-login',
@@ -12,7 +12,7 @@ import { NotifyService } from '../services/notify.service';
 export class LoginComponent implements OnInit {
 
   constructor(private router: Router,
-    private sessionStorage: SessionStorageService,
+    private localStorageService: LocalStorageService,
     private authService: AuthService,
     private notifyService: NotifyService) { }
 
@@ -32,9 +32,9 @@ export class LoginComponent implements OnInit {
           if (responseData['success']) {
             let expiredate = new Date(new Date().getTime() + (60 * 60 * 1000));
             this.notifyService.notificationMessage(responseData['message'], 'success');
-            this.sessionStorage.set('token', responseData['token'], 1, 'h');
-            this.sessionStorage.set('email', email, 1, 'h');
-            this.sessionStorage.set('expiretime', expiredate.toString());
+            this.localStorageService.set('token', responseData['token'], 1, 'h');
+            this.localStorageService.set('email', email, 1, 'h');
+            this.localStorageService.set('expiredate', expiredate.toString());
             this.router.navigate(["home"]);
           }
           else {

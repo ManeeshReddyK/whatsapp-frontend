@@ -1,0 +1,45 @@
+.messages {
+    height: 535px;
+}
+
+.contacts {
+    height: 535px;
+}
+
+.container {
+    margin-top: 20px;
+}
+
+.body-container {
+    margin-top: 15px;
+    margin-right: -1px;
+}
+
+.contact {
+    border-top: 1px dotted rgb(0, 5, 5);
+    border-bottom: 1px dotted rgb(0, 5, 5);
+    padding:10px 20px 10px 10px;
+    cursor: pointer;
+}
+
+.contact-container {
+    border: 1px solid black ;
+    padding:0px 0px 30px 0px ;
+}
+
+.message-container {
+    border: 1px solid black ;
+    padding: 30px;
+}
+
+.search-group {
+    padding: 10px 5px;
+}
+
+.text-muted {
+    padding: 15px 0px 0px 5px;
+}
+
+.active-chat {
+    background: #ebebeb;
+}

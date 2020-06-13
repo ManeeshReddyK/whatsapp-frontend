@@ -8,14 +8,16 @@ import { FormsModule } from '@angular/forms';
 import { AngularWebStorageModule } from 'angular-web-storage';
 import { HomeComponent } from './home/home.component';
 import { HttpClientModule } from '@angular/common/http';
-import { ConfigurationService } from './services/configuration.service';
+import { ConfigurationService } from './sharedFolder/services/configuration.service';
+import { AutoFocusDirective } from './sharedFolder/directives/auto-focus.directive';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
     RegisterComponent,
-    HomeComponent
+    HomeComponent,
+    AutoFocusDirective
   ],
   imports: [
     BrowserModule,
