@@ -1,46 +1,123 @@
+<app-header (logoutEmited)="logout()" [email]="userInfo?.email"></app-header>
 <div class="container ">
-  <div class="clearfix">
-    <div class="float-right">
-      <p class="d-inline">
-        {{userInfo?.email}}
-      </p>
-      <button class="btn btn-warning btn-sm" (click)="logout()">Logout</button>
-    </div>
-  </div>
   <div class="row body-container">
-    <div class="col-md-4 contact-container">
-      <div class="row">
+    <div class="col-md-4 contact-container d-md-block" [ngClass]="{'d-none': selectedUser}">
+      <div class="row contact-header">
         <div class="col-md-4 col-4">
-          <h5 class="text-muted">Contacts</h5>
+          <h5>Contacts</h5>
         </div>
         <div class="col-md-8 col-8">
-          <div class="input-group search-group">
-            <input class="form-control" type="text">
-            <button class="btn btn-sm btn-dark" data-toggle="modal" data-target="#addModal">Add</button>
+          <div class="search-group">
+            <span class="material-icons">
+              search
+            </span>
+            <input class="form-control search" type="text" [(ngModel)]="searchValue" name="searchValue"
+              (ngModelChange)="searchValueChange()" placeholder="search by email...">
           </div>
         </div>
       </div>
+      <button class="btn btn-sm rounded-circle add-button" data-toggle="modal" data-target="#addModal"><span
+          class="material-icons">
+          person_add
+        </span></button>
       <div class="contacts">
-        <div class="contact " [ngClass]="{'active-chat': selectedUser === contact.userId._id}"
-          *ngFor="let contact of userContacts" (click)="getUserMessages(contact)">
-          <p><em>{{contact.userId.email}}</em></p>
+        <div class="contact " [ngClass]="{'active-chat': selectedUser?.userId._id=== contact.userId._id}"
+          *ngFor="let contact of userContacts | search:searchValue:'userId':'email';let i = index;"
+          (click)="showEmojiMethod('contact'); getUserMessages(contact,i)">
+          <p class="mb-0"><em>{{contact.userId.email}}</em></p>
+          <p class="mb-0 contact-last-message">
+            <ng-container *ngIf="!contact.typing">
+              <p><span *ngIf="contact.lastMessage_Id?.sender.email === userInfo?.email"
+                  class="mr-2">&#x2713;</span>{{contact.lastMessage_Id?.content}}</p>
+            </ng-container>
+            <ng-container *ngIf="contact.typing">
+              <em style="color: green;">typing...</em>
+            </ng-container>
+          </p>
+          <span class="lastMessageTime">{{contact.lastMessage_Id?.lastMessageTimeCreated}}</span>
+          <span class="status" [ngClass]="{'online': contact.userId.status,'offline':!(contact.userId.status)}"></span>
+          <span class="notification badge badge-pill badge-success rounded-circle"
+            *ngIf="!contact.seen">{{contact.messageCount}}</span>
         </div>
       </div>
     </div>
-    <div class="col-md-8 message-container">
-      <div class="messages">
-        <div *ngFor="let message of userMessages">
-          <p>{{message}}</p>
+    <div class="col-sm-8 message-container d-none d-md-block" [ngClass]="{'d-none':!selectedUser}">
+      <div *ngIf="selectedUser" class="message-header pl-2 pt-2 pb-2">
+        <div class="mr-2 d-md-none d-inline-block">
+          <span class="material-icons" style="cursor: pointer;" (click)="onBackArrow()">
+            arrow_back
+          </span>
+        </div>
+        <div class="d-inline-block">
+          <h6>{{selectedUser?.userId.email}}</h6>
+          <p class="text-muted pt-0 pl-0" style="font-size: 12px;">
+            <ng-container *ngIf="!selectedUser?.typing">
+              <ng-container *ngIf="selectedUser?.userId.status">
+                {{"Online"}}
+              </ng-container>
+              <ng-container *ngIf="selectedUser && !(selectedUser?.userId.status)">
+                Last seen: {{selectedUser?.userId.lastSeen | date:"medium"}}
+              </ng-container>
+            </ng-container>
+            <ng-container *ngIf="selectedUser?.typing">
+              <em style="color:white;">typing...</em>
+            </ng-container>
+          </p>
+          <span title="Delete User" class="material-icons delete-icon" (click)="deleteContact()">
+            delete
+          </span>
         </div>
       </div>
-      <div class="input-group" *ngIf="selectedUser">
-        <input class="form-control" type="text" appAutoFocus>
-        <button class="btn btn-primary">send</button>
+      <div *ngIf="!selectedUser" class="main-page">
+        <img src="assets/images/chaticon.jfif" alt="chaticon">
+        <p class="text-muted">Allows user to send messages.
+          <br>
+          Communication can be done one to one.</p>
+      </div>
+      <div class="message-content">
+        <div #messagesRef class="messages" [ngStyle]="{'height': selectedUser? '507px': '609px' }">
+          <div *ngFor="let message of userMessages">
+            <div *ngIf="message.messageType ==='outgoing'" class="clearfix">
+              <div class="outgoing-message">
+                <p class="mb-0 outgoing-message-content"><span class="mr-1">&#x2713;</span>{{message.content}}</p>
+                <p class="mb-3 text-muted pt-0 outgoing-message-timestamp">
+                  {{message.time_created | date:"medium"}}</p>
+              </div>
+            </div>
+            <div *ngIf="message.messageType ==='incoming'">
+              <div class="incoming-message">
+                <p class=" mb-0 incoming-message-content">
+                  {{message.content}}</p>
+                <p class="mb-3 text-muted pt-0 incoming-message-timestamp">
+                  {{message.time_created | date:"medium"}}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <form #sendForm="ngForm" (ngSubmit)="showEmojiMethod('submit-button');sendMessage(sendForm);sendForm.reset();">
+          <div class="input-group" *ngIf="selectedUser" id="send-message">
+            <span class="material-icons emoji-icon" (click)="showEmojiMethod('icon')">
+              insert_emoticon
+            </span>
+            <input class="send-message-input" type="text" name="message" [(ngModel)]="message" appAutoFocus required
+              (ngModelChange)="userTyping()" placeholder="Type a message" (click)="showEmojiMethod('input')">
+            <button class="btn btn-info rounded-circle send-message-button" type="submit"
+              [disabled]="sendForm.invalid"><span class="material-icons">
+                send
+              </span></button>
+            <ng-container *ngIf="showEmoji">
+              <emoji-mart (emojiClick)="addEmoji($event)" showSingleCategory="true"
+                [style]="{ position: 'absolute', bottom: '45px', left: '30px' }">
+              </emoji-mart>
+            </ng-container>
+          </div>
+        </form>
       </div>
     </div>
   </div>
 </div>
 
+<!-- model -->
 <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">

@@ -39,6 +39,7 @@ export class ApiService {
             this.socket.on("connect", () => {
                 observer.next();
                 this.socket.emit("join");
+                this.status(true);
             })
 
             this.socket.on("error", (error) => {
@@ -113,6 +114,27 @@ export class ApiService {
         })
     }
 
+    deleteContact(userId) {
+        let headers = new HttpHeaders({ 'Authorization': `Bearer ${this.localStorageService.get('token')}` });
+        return new Observable(observer => {
+            this.httpService.delete(`${this.url}/api/deleteUser/${userId}`, { headers })
+                .subscribe(
+                    (response: any) => {
+                        if (response.success) {
+                            console.log(`Response for deleteContact :`, response);
+                            observer.next();
+                        }
+                        else {
+                            console.log(`Error in deleteContact :`, response);
+                        }
+                    },
+                    (error) => {
+                        console.log(`Error in deleteContact :`, error);
+                    }
+                )
+        })
+    }
+
     getUserMessages(conversation_Id, email) {
         let headers = new HttpHeaders({ 'Authorization': `Bearer ${this.localStorageService.get('token')}`, 'conversation_Id': conversation_Id });
         return new Observable(observer => {
@@ -135,8 +157,69 @@ export class ApiService {
 
     }
 
+    sendMessage(receiver, message) {
+        this.socket.emit("sendMessage", receiver, message);
+    }
+
+    receiveMessageListener() {
+        return new Observable((observer) => {
+            this.socket.on('receiveMessage', (message) => {
+                observer.next(message);
+            })
+        })
+    }
+
+    addUserListener() {
+        return new Observable(observer => {
+            this.socket.on('addUser', (data) => {
+                observer.next(data);
+            })
+        })
+    }
+
+    deleteUserListener() {
+        return new Observable((observer) => {
+            this.socket.on('deleteUser', (userId) => {
+                observer.next(userId);
+            })
+        })
+    }
+
+    isOnlineListener() {
+        return new Observable((observer) => {
+            this.socket.on('isOnline', (userId) => {
+                observer.next(userId);
+            })
+        })
+    }
+
+    isOfflineListener() {
+        return new Observable((observer) => {
+            this.socket.on('isOffline', (userId) => {
+                observer.next(userId);
+            })
+        })
+    }
+
+    userTypingListener() {
+        return new Observable((observer) => {
+            this.socket.on('userTyping', (userId) => {
+                observer.next(userId);
+            })
+        })
+    }
+
+    status(flag) {
+        this.socket.emit('status', flag);
+    }
+
+    typingStatus(recevierId) {
+        this.socket.emit('userTyping', recevierId);
+    }
+
     logout() {
         console.log("closing socket");
         this.socket.emit("leave");
+        this.status(false);
     }
 }

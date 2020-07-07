@@ -4,6 +4,7 @@ import { LoginComponent } from './login/login.component';
 import { RegisterComponent } from './register/register.component';
 import { HomeComponent } from './home/home.component';
 import { LoginRequiredGuard } from './sharedFolder/guards/loginRequiredGuard.guard';
+import { HeaderComponent } from './header/header.component';
 
 const routes: Routes = [
     {
@@ -23,6 +24,10 @@ const routes: Routes = [
         canActivate: [LoginRequiredGuard],
         data: { route: "home" },
         component: HomeComponent
+    },
+    {
+        path: "header",
+        component: HeaderComponent
     },
     {
         path: "",

@@ -19,6 +19,7 @@
     "@angular/platform-browser": "~7.2.0",
     "@angular/platform-browser-dynamic": "~7.2.0",
     "@angular/router": "~7.2.0",
+    "@ctrl/ngx-emoji-mart": "^0.17.0",
     "angular-web-storage": "^4.1.0",
     "bootstrap": "^4.5.0",
     "bootstrap-notify": "^3.1.3",
