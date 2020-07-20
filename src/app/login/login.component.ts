@@ -20,7 +20,7 @@ export class LoginComponent implements OnInit {
   }
 
   login(form) {
-    let email = form.value.email;
+    let email = form.value.email.toLowerCase();
     let password = form.value.password;
     let body = {
       email, password
@@ -31,19 +31,21 @@ export class LoginComponent implements OnInit {
         responseData => {
           if (responseData['success']) {
             let expiredate = new Date(new Date().getTime() + (60 * 60 * 1000));
-            this.notifyService.notificationMessage(responseData['message'], 'success');
+            this.notifyService.openSnackBar(responseData['message'], 'Success');
             this.localStorageService.set('token', responseData['token'], 1, 'h');
             this.localStorageService.set('email', email, 1, 'h');
             this.localStorageService.set('expiredate', expiredate.toString());
             this.router.navigate(["home"]);
           }
           else {
-            this.notifyService.notificationMessage(responseData['message'], 'danger');
-            this.router.navigate(["register"]);
+            this.notifyService.openSnackBar(responseData['message']);
+            if (responseData['status'] === 400) {
+              this.router.navigate(["register"]);
+            }
           }
         },
         (error) => {
-          this.notifyService.notificationMessage("Error", 'danger');
+          this.notifyService.openSnackBar("Error due to server");
           console.log('error :', error);
         }
       )

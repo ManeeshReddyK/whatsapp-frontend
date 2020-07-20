@@ -4,7 +4,11 @@ import { LocalStorageService } from 'angular-web-storage';
 import { Router } from '@angular/router';
 import { NotifyService } from '../sharedFolder/services/notify.service';
 import { LastMessageTimePipe } from '../sharedFolder/pipes/lastMessageTime.pipe';
-import { element } from 'protractor';
+import { SocketService } from '../sharedFolder/services/socket.service';
+import { MatDialog } from '@angular/material';
+import { AddcontactComponent } from '../sharedFolder/modals/addcontact/addcontact.component';
+import { DeactivateaccountComponent } from '../sharedFolder/modals/deactivateaccount/deactivateaccount.component';
+import { ProfileComponent } from '../sharedFolder/modals/profile/profile.component';
 
 @Component({
   selector: 'app-home',
@@ -22,24 +26,28 @@ export class HomeComponent implements OnInit {
   @ViewChild('messagesRef') messageRef: ElementRef
   showEmoji: boolean;
   message = '';
+  scrollButton = false;
+  dialogRef: any;
 
   constructor(
     private apiService: ApiService,
     private localStorageService: LocalStorageService,
     private router: Router,
     private notifyService: NotifyService,
-    private lastMessageTimePipe: LastMessageTimePipe
+    private lastMessageTimePipe: LastMessageTimePipe,
+    private socketService: SocketService,
+    private matDialogService: MatDialog
   ) { }
 
   ngOnInit() {
-    this.apiService.initializeSocket()
+    this.socketService.initializeSocket()
       .subscribe(
         () => {
           console.log("socket connection established");
           this.getUserProfile();
           this.getUserContacts();
           document.addEventListener('visibilitychange', () => {
-            this.apiService.status(!document.hidden);
+            this.socketService.status(!document.hidden);
           })
 
           setInterval(() => {
@@ -50,7 +58,7 @@ export class HomeComponent implements OnInit {
         (error) => {
           console.log("socket connection failed");
           let message = `Websocket : ${error}`;
-          this.notifyService.notificationMessage(message, "danger");
+          this.notifyService.openSnackBar(message);
           this.clearSession();
         }
       );
@@ -66,7 +74,7 @@ export class HomeComponent implements OnInit {
       this.clearSession();
     }
 
-    this.apiService.receiveMessageListener()
+    this.socketService.receiveMessageListener()
       .subscribe(
         (message: any) => {
 
@@ -96,7 +104,7 @@ export class HomeComponent implements OnInit {
         }
       );
 
-    this.apiService.isOnlineListener()
+    this.socketService.isOnlineListener()
       .subscribe(
         (userId) => {
           this.userContacts.forEach(contact => {
@@ -107,7 +115,7 @@ export class HomeComponent implements OnInit {
         }
       );
 
-    this.apiService.isOfflineListener()
+    this.socketService.isOfflineListener()
       .subscribe(
         (userId) => {
           this.userContacts.forEach(contact => {
@@ -118,7 +126,7 @@ export class HomeComponent implements OnInit {
         }
       );
 
-    this.apiService.userTypingListener()
+    this.socketService.userTypingListener()
       .subscribe(
         (userId) => {
           console.log(userId);
@@ -138,7 +146,7 @@ export class HomeComponent implements OnInit {
         }
       )
 
-    this.apiService.addUserListener()
+    this.socketService.addUserListener()
       .subscribe(
         (data: any) => {
           console.log('addUser:', data);
@@ -150,7 +158,7 @@ export class HomeComponent implements OnInit {
         }
       )
 
-    this.apiService.deleteUserListener()
+    this.socketService.deleteUserListener()
       .subscribe(
         (userId) => {
           this.userContacts = this.userContacts.filter(element => element.userId._id !== userId);
@@ -161,7 +169,37 @@ export class HomeComponent implements OnInit {
         }
       )
 
+    this.apiService.userImageChanged.subscribe((url) => {
+      this.userInfo.profileImage = url;
+    })
 
+  }
+
+  openAddDialog() {
+    this.dialogRef = this.matDialogService.open(AddcontactComponent, {
+      width: '500px',
+    });
+
+    this.dialogRef.afterClosed()
+      .subscribe(email => {
+        if (email) {
+          this.addContact(email.toLowerCase());
+        }
+      })
+  }
+
+  contactProfile() {
+    this.dialogRef = this.matDialogService.open(ProfileComponent, { data: { type: "userProfile", user: this.selectedUser.userId }, width: "700px" });
+  }
+
+  scrollFunction() {
+    var messageContent = this.messageRef.nativeElement.scrollHeight; //content of the message
+    var yOffset = this.messageRef.nativeElement.scrollTop; //the scroller position of user
+    if (yOffset < messageContent - 1.0125 * this.messageRef.nativeElement.offsetHeight) {
+      this.scrollButton = true;
+    } else {
+      this.scrollButton = false;
+    }
   }
 
   getUserProfile() {
@@ -169,6 +207,7 @@ export class HomeComponent implements OnInit {
       .subscribe(
         (response: any) => {
           this.userInfo = response.data;
+          this.userInfo.status = true;//online event is not emited so it is set as true
         }
       )
   }
@@ -193,8 +232,8 @@ export class HomeComponent implements OnInit {
       )
   }
 
-  addContact(form) {
-    this.apiService.addContact(form.value.email)
+  addContact(email) {
+    this.apiService.addContact(email)
       .subscribe(
         (response: any) => {
           let element = response.data;
@@ -207,15 +246,30 @@ export class HomeComponent implements OnInit {
   }
 
   deleteContact() {
-    let userId = this.selectedUser.userId._id;
-    this.apiService.deleteContact(userId)
+    this.dialogRef = this.matDialogService.open(DeactivateaccountComponent, { data: { type: "delete", email: this.selectedUser.userId.email } });
+    this.dialogRef.afterClosed()
+      .subscribe(flag => {
+        if (flag) {
+          let userId = this.selectedUser.userId._id;
+          this.apiService.deleteContact(userId)
+            .subscribe(
+              () => {
+                this.userContacts = this.userContacts.filter(element => element.userId._id !== userId);
+                if (this.selectedUser && userId === this.selectedUser.userId._id) {
+                  this.selectedUser = undefined;
+                  this.userMessages = [];
+                }
+              }
+            )
+        }
+      })
+  }
+
+  deactivateAccount() {
+    this.apiService.deactivateAccount()
       .subscribe(
         () => {
-          this.userContacts = this.userContacts.filter(element => element.userId._id !== userId);
-          if (this.selectedUser && userId === this.selectedUser.userId._id) {
-            this.selectedUser = undefined;
-            this.userMessages = [];
-          }
+          this.logout();
         }
       )
   }
@@ -250,7 +304,7 @@ export class HomeComponent implements OnInit {
       time_created: new Date().getTime(),
       conversation_Id: this.selectedUser.conversation_Id
     }
-    this.apiService.sendMessage(this.selectedUser.userId._id, message);
+    this.socketService.sendMessage(this.selectedUser.userId._id, message);
     message.messageType = "outgoing";
     this.userMessages.push(message);
     this.gotoBottomPage();
@@ -270,17 +324,14 @@ export class HomeComponent implements OnInit {
   }
 
   logout() {
-    this.apiService.logout();
+    this.socketService.logout();
     this.clearSession();
-  }
-
-  ngOnDestroy(): void {
-    clearTimeout(this.timeout)
   }
 
   gotoBottomPage() {
     setTimeout(() => {
       this.messageRef.nativeElement.scrollTop = this.messageRef.nativeElement.scrollHeight;
+      this.scrollButton = false
     }, 0)
   }
 
@@ -307,7 +358,7 @@ export class HomeComponent implements OnInit {
   }
 
   userTyping() {
-    this.apiService.typingStatus(this.selectedUser.userId._id);
+    this.socketService.typingStatus(this.selectedUser.userId._id);
   }
 
   showEmojiMethod(type) {
@@ -328,4 +379,16 @@ export class HomeComponent implements OnInit {
     this.selectedUser = undefined;
     this.userMessages = [];
   }
+
+  setStyle(imgUrl) {
+    return { 'background-image': `url(${imgUrl})` };
+  }
+
+  ngOnDestroy(): void {
+    clearTimeout(this.timeout)
+    if (this.dialogRef) {
+      this.dialogRef.close();
+    }
+  }
+
 }

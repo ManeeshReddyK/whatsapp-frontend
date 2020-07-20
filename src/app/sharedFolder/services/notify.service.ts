@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { MatSnackBar } from '@angular/material';
 declare const $: any;
 
 @Injectable({
@@ -6,7 +7,13 @@ declare const $: any;
 })
 export class NotifyService {
 
-    constructor() { }
+    constructor(private snackBar: MatSnackBar) { }
+
+    openSnackBar(message: string, type: "Error" | "Success" = "Error") {
+        this.snackBar.open(message, "", {
+            panelClass: type === "Error" ? "error-notification" : "success-notification"
+        });
+    }
 
     notificationMessage(toasterMsg, toasterType) {
 

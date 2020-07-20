@@ -18,7 +18,7 @@ export class RegisterComponent implements OnInit {
   }
 
   register(form) {
-    let email = form.value.email;
+    let email = form.value.email.toLowerCase();
     let password = form.value.password;
     let body = {
       email, password
@@ -28,15 +28,15 @@ export class RegisterComponent implements OnInit {
       .subscribe(
         (responseData) => {
           if (responseData['success']) {
-            this.notifyService.notificationMessage(responseData['message'], 'success');
+            this.notifyService.openSnackBar(responseData['message'], 'Success');
             this.router.navigate(["login"]);
           }
           else {
-            this.notifyService.notificationMessage(responseData['message'], 'danger');
+            this.notifyService.openSnackBar(responseData['message']);
           }
         },
         (error) => {
-          this.notifyService.notificationMessage("Error", 'danger');
+          this.notifyService.openSnackBar("Error due to server");
           console.log('error :', error);
         }
       )

@@ -1,0 +1,14 @@
+<h2 mat-dialog-title>Add Contact</h2>
+<mat-dialog-content class="mat-typography">
+  <mat-form-field style="width: 100%;">
+    <input matInput [(ngModel)]="email" name="email" placeholder="Email Address" cdkFocusInitial
+      #emailcontroller="ngModel" required email>
+    <mat-error *ngIf="emailcontroller.errors?.required">Email Address is required</mat-error>
+    <mat-error *ngIf="emailcontroller.errors?.email">Enter valid Email Address</mat-error>
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-raised-button color="warn" [mat-dialog-close]="false">Cancel</button>
+  <button mat-raised-button class="success-button" [mat-dialog-close]="email"
+    [disabled]="emailcontroller.invalid">Add</button>
+</mat-dialog-actions>

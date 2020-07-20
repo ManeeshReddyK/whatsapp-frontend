@@ -1,4 +1,5 @@
-<app-header (logoutEmited)="logout()" [email]="userInfo?.email"></app-header>
+<app-header (logoutEmited)="logout()" (deactivateAccountEmited)="deactivateAccount()" [userInfo]="userInfo">
+</app-header>
 <div class="container ">
   <div class="row body-container">
     <div class="col-md-4 contact-container d-md-block" [ngClass]="{'d-none': selectedUser}">
@@ -12,23 +13,24 @@
               search
             </span>
             <input class="form-control search" type="text" [(ngModel)]="searchValue" name="searchValue"
-              (ngModelChange)="searchValueChange()" placeholder="search by email...">
+              (ngModelChange)="searchValueChange()" placeholder="Search">
           </div>
         </div>
       </div>
-      <button class="btn btn-sm rounded-circle add-button" data-toggle="modal" data-target="#addModal"><span
-          class="material-icons">
-          person_add
-        </span></button>
+      <button mat-mini-fab (click)="openAddDialog()" class="add-button">
+        <mat-icon>person_add</mat-icon>
+      </button>
       <div class="contacts">
         <div class="contact " [ngClass]="{'active-chat': selectedUser?.userId._id=== contact.userId._id}"
           *ngFor="let contact of userContacts | search:searchValue:'userId':'email';let i = index;"
           (click)="showEmojiMethod('contact'); getUserMessages(contact,i)">
+          <div class="contact-header-image" [ngStyle]="setStyle(contact.userId.profileImage)">
+          </div>
           <p class="mb-0"><em>{{contact.userId.email}}</em></p>
           <p class="mb-0 contact-last-message">
             <ng-container *ngIf="!contact.typing">
-              <p><span *ngIf="contact.lastMessage_Id?.sender.email === userInfo?.email"
-                  class="mr-2">&#x2713;</span>{{contact.lastMessage_Id?.content}}</p>
+              <span *ngIf="contact.lastMessage_Id?.sender.email === userInfo?.email"
+                class="mr-2">&#x2713;</span>{{contact.lastMessage_Id?.content}}
             </ng-container>
             <ng-container *ngIf="contact.typing">
               <em style="color: green;">typing...</em>
@@ -44,11 +46,15 @@
     <div class="col-sm-8 message-container d-none d-md-block" [ngClass]="{'d-none':!selectedUser}">
       <div *ngIf="selectedUser" class="message-header pl-2 pt-2 pb-2">
         <div class="mr-2 d-md-none d-inline-block">
-          <span class="material-icons" style="cursor: pointer;" (click)="onBackArrow()">
+          <span class="material-icons" style="cursor: pointer; position: relative; bottom: 9px;"
+            (click)="onBackArrow()">
             arrow_back
           </span>
         </div>
-        <div class="d-inline-block">
+        <div class="message-header-image d-inline-block mr-2" (click)=" contactProfile()"
+          [ngStyle]="setStyle(selectedUser?.userId.profileImage)">
+        </div>
+        <div class="d-inline-block message-header-text">
           <h6>{{selectedUser?.userId.email}}</h6>
           <p class="text-muted pt-0 pl-0" style="font-size: 12px;">
             <ng-container *ngIf="!selectedUser?.typing">
@@ -63,19 +69,30 @@
               <em style="color:white;">typing...</em>
             </ng-container>
           </p>
-          <span title="Delete User" class="material-icons delete-icon" (click)="deleteContact()">
-            delete
-          </span>
+        </div>
+        <div class="d-inline-block">
+          <button mat-icon-button [matMenuTriggerFor]="menu" class="delete-icon">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #menu="matMenu">
+            <button mat-menu-item matTooltip="Profile" (click)="contactProfile()">
+              <span>Profile</span>
+            </button>
+            <button mat-menu-item matTooltip="Delete User" (click)="deleteContact()">
+              <span>Delete Contact</span>
+            </button>
+          </mat-menu>
         </div>
       </div>
       <div *ngIf="!selectedUser" class="main-page">
-        <img src="assets/images/chaticon.jfif" alt="chaticon">
+        <img src="assets/images/icon.png" alt="chaticon">
         <p class="text-muted">Allows user to send messages.
           <br>
           Communication can be done one to one.</p>
       </div>
       <div class="message-content">
-        <div #messagesRef class="messages" [ngStyle]="{'height': selectedUser? '507px': '609px' }">
+        <div #messagesRef class="messages" [ngStyle]="{'height': selectedUser? '507px': '609px' }"
+          (scroll)="scrollFunction()">
           <div *ngFor="let message of userMessages">
             <div *ngIf="message.messageType ==='outgoing'" class="clearfix">
               <div class="outgoing-message">
@@ -94,49 +111,26 @@
             </div>
           </div>
         </div>
+        <button mat-mini-fab *ngIf="scrollButton" class="scroll-button" (click)="gotoBottomPage()">
+          <mat-icon>keyboard_arrow_down</mat-icon>
+        </button>
         <form #sendForm="ngForm" (ngSubmit)="showEmojiMethod('submit-button');sendMessage(sendForm);sendForm.reset();">
           <div class="input-group" *ngIf="selectedUser" id="send-message">
             <span class="material-icons emoji-icon" (click)="showEmojiMethod('icon')">
               insert_emoticon
             </span>
-            <input class="send-message-input" type="text" name="message" [(ngModel)]="message" appAutoFocus required
+            <input class="send-message-input" type="text" name="message" [(ngModel)]="message" required
               (ngModelChange)="userTyping()" placeholder="Type a message" (click)="showEmojiMethod('input')">
-            <button class="btn btn-info rounded-circle send-message-button" type="submit"
-              [disabled]="sendForm.invalid"><span class="material-icons">
-                send
-              </span></button>
+            <button mat-mini-fab class="send-message-button" type="submit" [disabled]="sendForm.invalid">
+              <mat-icon>send</mat-icon>
+            </button>
             <ng-container *ngIf="showEmoji">
               <emoji-mart (emojiClick)="addEmoji($event)" showSingleCategory="true"
-                [style]="{ position: 'absolute', bottom: '45px', left: '30px' }">
+                [style]="{ position: 'absolute', bottom: '45px', left: '30px'}">
               </emoji-mart>
             </ng-container>
           </div>
         </form>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- model -->
-<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Add Contacts</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close" (click)="addForm.reset();">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form #addForm="ngForm">
-          <input appAutoFocus class="form-control" placeholder="Enter email Address" ngModel name="email" type="text"
-            required>
-        </form>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal" (click)="addForm.reset();">Close</button>
-        <button type="button" class="btn btn-primary" (click)="addContact(addForm); addForm.reset();"
-          data-dismiss="modal">Add</button>
       </div>
     </div>
   </div>

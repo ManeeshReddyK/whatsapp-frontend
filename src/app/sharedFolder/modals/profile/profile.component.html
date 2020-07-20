@@ -1,0 +1,39 @@
+<h2 mat-dialog-title>{{data.type === "mainUser"?"My Profile":"User Profile"}}</h2>
+<mat-dialog-content class="mat-typography">
+  <ng-container>
+    <div class="row">
+      <div style="margin-right: auto;margin-left: auto;">
+        <div style="position: relative;">
+          <img [src]="data.user?.profileImage" class="user-image" alt="" #profileImage
+            [ngStyle]="{'filter': spinner?'blur(2px)':'blur(0px)'}">
+          <div *ngIf="spinner" class="spinner-container">
+            <mat-spinner></mat-spinner>
+          </div>
+          <ng-container *ngIf="data.type === 'mainUser'">
+            <input #picker type="file" (change)="onFileChange($event)" style="display: none;">
+            <div class="photo-camera-background">
+              <mat-icon (click)="picker.click()" class="photo-camera">photo_camera</mat-icon>
+            </div>
+          </ng-container>
+        </div>
+
+      </div>
+      <div class="col-md-8 user-profile">
+        <p class="mb-0"><strong>Email : {{data.user?.email}}</strong></p>
+        <br>
+        <ng-container *ngIf="data.user?.status">
+          <p><strong> Status : {{"Online"}}</strong></p>
+        </ng-container>
+        <ng-container *ngIf="!data.user?.status">
+          <p class="last-seen"> Last Seen :
+            {{data.user?.lastSeen | date:"medium"}}</p>
+        </ng-container>
+      </div>
+    </div>
+  </ng-container>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button color="primary" mat-dialog-close>close</button>
+  <button *ngIf="data.type === 'mainUser'" [disabled]="!uploadButton" mat-button color="primary"
+    (click)="onUpload()">upload</button>
+</mat-dialog-actions>

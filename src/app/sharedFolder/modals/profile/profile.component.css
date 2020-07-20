@@ -1,0 +1,63 @@
+.user-image {
+    background-image: url('https://material.angular.io/assets/img/examples/shiba1.jpg');
+    background-size: cover;
+    height: 200px;
+    width: 200px;
+    border: none;
+    border-radius: 50%;
+    flex-shrink: 0;
+    object-fit: cover;
+}
+
+.user-profile {
+    padding: 60px 0px 0px 40px;
+    font-size: 30px;
+    font-family: 'Sacramento', cursive;
+}
+
+.last-seen {
+    font-size: 20px;
+    font-family: 'Montserrat'
+}
+
+.photo-camera {
+    cursor: pointer;
+    font-size: 35px;
+    color: white;
+    padding-left: 5px;
+    padding-top: 5px;
+}
+
+.photo-camera-background {
+    height: 45px;
+    width: 45px;
+    position: absolute;
+    right: 0px;
+    bottom: 25px;
+    background-color: #17a2b8;
+    border-radius: 50%;
+}
+
+.spinner-container {
+    position: absolute;
+    top: 75px;
+    left: 75px;
+}
+
+.spinner-container .mat-spinner, ::ng-deep.spinner-container .mat-spinner svg {
+    height: 50px !important;
+    width: 50px !important;
+}
+
+::ng-deep.spinner-container .mat-spinner circle {
+    stroke: #fff;
+}
+
+@media(max-width:450px) {
+    .user-profile {
+        font-size: 20px;
+    }
+    .last-seen {
+        font-size: 12px;
+    }
+}

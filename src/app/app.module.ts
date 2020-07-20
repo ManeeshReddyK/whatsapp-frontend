@@ -14,6 +14,12 @@ import { HeaderComponent } from './header/header.component';
 import { LastMessageTimePipe } from './sharedFolder/pipes/lastMessageTime.pipe';
 import { SearchPipe } from './sharedFolder/pipes/search.pipe';
 import { PickerModule } from '@ctrl/ngx-emoji-mart';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { MaterialModule } from './sharedFolder/modules/material.module';
+import { MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material';
+import { AddcontactComponent } from './sharedFolder/modals/addcontact/addcontact.component';
+import { DeactivateaccountComponent } from './sharedFolder/modals/deactivateaccount/deactivateaccount.component';
+import { ProfileComponent } from './sharedFolder/modals/profile/profile.component';
 
 @NgModule({
   declarations: [
@@ -23,22 +29,34 @@ import { PickerModule } from '@ctrl/ngx-emoji-mart';
     HomeComponent,
     AutoFocusDirective,
     HeaderComponent,
-    SearchPipe
+    SearchPipe,
+    AddcontactComponent,
+    DeactivateaccountComponent,
+    ProfileComponent,
+    LastMessageTimePipe
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     AppRoutingModule,
     FormsModule,
     AngularWebStorageModule,
     HttpClientModule,
-    PickerModule
+    PickerModule,
+    MaterialModule
   ],
   providers: [
     LastMessageTimePipe,
     {
       provide: APP_INITIALIZER, useFactory: (configService: ConfigurationService) => () => { return configService.load() }, deps: [ConfigurationService], multi: true
-    }
+    },
+    { provide: MAT_SNACK_BAR_DEFAULT_OPTIONS, useValue: { duration: 2500 } }
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  entryComponents: [
+    AddcontactComponent,
+    DeactivateaccountComponent,
+    ProfileComponent
+  ]
 })
 export class AppModule { }

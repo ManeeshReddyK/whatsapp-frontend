@@ -24,7 +24,7 @@ export class ConfigurationService {
         return new Promise((resolve, reject) => {
             this.httpClientService.get('assets/configuration/config.json')
                 .subscribe(
-                    (response) => {
+                    (response: Configuration) => {
                         this.setConfiguration(response);
                         resolve();
                     },
@@ -36,8 +36,11 @@ export class ConfigurationService {
         })
     }
 
-    setConfiguration(response) {
+    setConfiguration(response: Configuration) {
         this.configuration = response;
+        if (response.production) {
+            console.log = () => { };
+        }
     }
 
     getConfiguration() {

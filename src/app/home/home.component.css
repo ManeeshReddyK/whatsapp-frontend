@@ -5,6 +5,7 @@
 }
 
 /*messages*/
+
 .messages {
     overflow-y: auto;
     height: 507px;
@@ -15,6 +16,7 @@
     background-image: url('/assets/images/whatsappbackground.jpg');
     padding-bottom: 15px;
     padding-top: 5px;
+    position: relative;
 }
 
 .send-message-input {
@@ -35,8 +37,14 @@
 }
 
 .send-message-button {
-    padding-left: 15px;
-    padding-top: 9px;
+    background-color: #17a2b8;
+    height: 45px;
+    width: 45px;
+}
+
+.send-message-button[disabled] {
+    background-color: #63b8c6 !important;
+    color: white !important;
 }
 
 .outgoing-message-content {
@@ -50,7 +58,7 @@
 }
 
 .incoming-message-content {
-    background:whitesmoke none repeat scroll 0 0;
+    background: whitesmoke none repeat scroll 0 0;
     border-radius: 3px;
     font-size: 14px;
     margin: 0;
@@ -80,7 +88,7 @@
 }
 
 .message-container {
-    border: 1px solid black ;
+    border: 1px solid black;
     padding-right: 0;
     padding-left: 0;
     position: relative;
@@ -89,11 +97,12 @@
 .main-page {
     position: absolute;
     text-align: center;
+    z-index: 1;
     top: calc(50% - 100px);
     left: calc(50% - 150px);
 }
 
-.main-page img{
+.main-page img {
     height: 150px;
     width: 150px;
 }
@@ -120,8 +129,8 @@
 
 .message-header {
     height: 58px;
-    background-color : #17a2b8;
-    color:white;
+    background-color: #17a2b8;
+    color: white;
     position: relative;
 }
 
@@ -129,8 +138,13 @@
     position: absolute;
     cursor: pointer;
     color: white;
-    top: 15px;
+    top: 8px;
     right: 15px;
+}
+
+.mat-menu-item {
+    line-height: 35px;
+    height: 35px;
 }
 
 .message-header h6 {
@@ -141,13 +155,51 @@
     color: white !important;
 }
 
+.message-header-text {
+    position: relative;
+    bottom: 7px;
+}
+
+.message-header-image {
+    cursor: pointer;
+    background-size: cover;
+    height: 43px;
+    width: 43px;
+    border: none;
+    border-radius: 50%;
+    flex-shrink: 0;
+    object-fit: cover;
+}
+
+.scroll-button {
+    position: absolute;
+    bottom: 90px;
+    right: 47px;
+    background-color: #17a2b8;
+    cursor: pointer;
+}
+
 /* contacts */
+
+.contact-header-image {
+    background-size: cover;
+    height: 43px;
+    width: 43px;
+    border: none;
+    border-radius: 50%;
+    flex-shrink: 0;
+    object-fit: cover;
+    position: absolute;
+    left: 8px;
+    top: 15px;
+}
+
 .search {
     border-radius: 20px;
     padding-left: 34px;
 }
 
-.search:focus,.search:hover {
+.search:focus, .search:hover {
     box-shadow: none;
     border: #999999 1px solid;
 }
@@ -166,17 +218,17 @@
 
 .contact {
     border-bottom: 1px solid rgb(0, 5, 5);
-    padding:10px 20px 10px 10px;
+    padding: 10px 20px 10px 60px;
     cursor: pointer;
-    height:70px;
+    height: 70px;
     position: relative;
 }
 
 .contact-last-message {
-    white-space: nowrap; 
-    width: 75%; 
+    white-space: nowrap;
+    width: 75%;
     overflow: hidden;
-    text-overflow: ellipsis; 
+    text-overflow: ellipsis;
 }
 
 .status {
@@ -185,7 +237,7 @@
     border-radius: 50%;
     position: absolute;
     top: 15px;
-    right: 10px ;
+    right: 10px;
 }
 
 .notification {
@@ -204,12 +256,12 @@
 }
 
 .status.offline {
-    background-color:orange;
+    background-color: orange;
 }
 
 .contact-container {
-    border: 1px solid black ;
-    padding:0px 0px 30px 0px ;
+    border: 1px solid black;
+    padding: 0px 0px 30px 0px;
     position: relative;
 }
 
@@ -217,7 +269,9 @@
     position: absolute;
     bottom: 20px;
     right: 20px;
-    border: 2px solid;
+    height: 45px;
+    width: 45px;
+    background-color: #17a2b8;
 }
 
 .search-group {
@@ -244,19 +298,42 @@
     background: #ebebeb;
 }
 
-::ng-deep  emoji-mart .emoji-mart-preview {
+::ng-deep emoji-mart .emoji-mart-preview {
     display: none;
 }
 
 @media(max-width:768px) {
-    .outgoing-message, .incoming-message{
+    .outgoing-message, .incoming-message {
         max-width: 85%;
     }
 }
 
 @media(max-width:1200px) {
     .send-message-input {
-        width: 78%;
+        width: 75%;
         min-height: 25px;
+    }
+}
+
+@media(max-width:350px) {
+    .send-message-input {
+        width: 70%;
+        min-height: 25px;
+    }
+}
+
+@media(max-height:680px) {
+    .messages {
+        height: 357px !important;
+    }
+    .contacts {
+        height: 385px !important;
+    }
+}
+
+@media(max-width:500px) {
+    ::ng-deep.emoji-mart {
+        width: 270px !important;
+        height: 353px !important;
     }
 }

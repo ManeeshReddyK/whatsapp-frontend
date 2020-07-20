@@ -1,4 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
+@import "~@angular/material/prebuilt-themes/indigo-pink.css";
 *::-webkit-scrollbar {
 	width: 5px;
 	height: 5px;
@@ -14,4 +15,33 @@
 	background: rgb(184, 181, 181);
 	border: 0.5px solid rgb(184, 181, 181);
 	border-radius: 100px;
+}
+
+button:focus, button:hover {
+	outline: none;
+}
+
+.mat-snack-bar-container {
+	text-align: center;
+}
+
+.mat-snack-bar-container .mat-simple-snackbar {
+	display: block;
+}
+
+.success-button {
+    background-color: forestgreen !important;
+    color: white !important;
+}
+
+.success-button[disabled] {
+	opacity: 0.5 !important;
+}
+
+.success-notification {
+	background-color: forestgreen;
+}
+
+.error-notification {
+	background-color: #f44336;
 }

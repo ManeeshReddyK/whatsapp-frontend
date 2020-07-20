@@ -1,33 +1,41 @@
 <div class="main-box">
-  <div class="container">
-    <div class="login-box">
+  <div>
+    <h1 class="heading text-muted">
+      Messaging App</h1>
+    <div class="container login-box">
       <h1>Login</h1>
       <form #form="ngForm">
-        <div class="form-group">
+        <div class="form-group ">
           <div class="text-box">
-            <i class="fas fa-envelope icon fa-1x"></i><label for="email">Email</label>
-            <input type="text" class="form-control" ngModel placeholder="Email" id="email" name="email" required
-              #emailController="ngModel" pattern="^[a-z0-9](\.?[a-z0-9]){5,}@gmail\.com$">
-            <p style="color: red;" *ngIf="emailController.errors?.required && emailController.touched">Email is required
-            </p>
-            <p style="color: red;"
-              *ngIf="!emailController.errors?.required && emailController.errors?.pattern && emailController.touched">
-              Please enter valid
-              Email address</p>
+            <mat-form-field appearance="outline" style="width: 100%;">
+              <mat-label>Email Address</mat-label>
+              <mat-icon matPrefix>email</mat-icon>
+              <input matInput placeholder="Email Address" ngModel #emailController="ngModel" required email name="email"
+                type="text">
+              <mat-error *ngIf="emailController.errors?.required && emailController.touched">Email is required
+              </mat-error>
+              <mat-error *ngIf="emailController.errors?.email && emailController.touched">Please enter valid email
+              </mat-error>
+            </mat-form-field>
           </div>
         </div>
-        <div class="form-group">
+        <div class="form-group ">
           <div class="text-box">
-            <i class="fas fa-key icon fa-1x"></i><label for="password">Password</label>
-            <input type="password" class="form-control" ngModel placeholder="Password" id="password" name="password"
-              required #passwordController="ngModel">
-            <p style="color: red;" *ngIf="passwordController.invalid && passwordController.touched">Password is
-              required</p>
+            <mat-form-field appearance="outline" style="width: 100%;">
+              <mat-label>Password</mat-label>
+              <mat-icon matPrefix>lock</mat-icon>
+              <input matInput placeholder="Password" ngModel #passwordController="ngModel" required name="password"
+                type="password">
+              <mat-error *ngIf="passwordController.errors?.required && passwordController.touched">Password is required
+              </mat-error>
+            </mat-form-field>
           </div>
         </div>
-        <button class="btn btn-success button" (click)="login(form); form.reset();"
-          [disabled]="form.invalid">sign-in</button>
+        <button mat-flat-button (click)="login(form); form.reset();" [disabled]="form.invalid"
+          class="btn-block login-button">Sign-in</button>
       </form>
+      <p class="mb-0 mt-3 text-center text-muted register" style="font-size: 12px;">New user? <u
+          routerLink="/register">Register</u></p>
     </div>
   </div>
 </div>
