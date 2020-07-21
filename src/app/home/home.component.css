@@ -13,7 +13,6 @@
 }
 
 .message-content {
-    background-image: url('/assets/images/whatsappbackground.jpg');
     padding-bottom: 15px;
     padding-top: 5px;
     position: relative;
@@ -88,6 +87,7 @@
 }
 
 .message-container {
+    background-image: url('/assets/images/whatsappbackground.jpg');
     border: 1px solid black;
     padding-right: 0;
     padding-left: 0;
